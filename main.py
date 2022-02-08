@@ -42,26 +42,41 @@ class Grid:
         except Exception:
             raise AttributeError(f"square_size = {value} is not convertible to integer")
 
-        try:
-            if value < 18:
-                raise AttributeError(f"square_size = {value} is under 18")
+        if value < 18:
+            raise AttributeError(f"square_size = {value} is under 18")
 
 
     @property
-        def cells(self):
-            return self._cells
+    def cells(self):
+        return self._cells
 
-        @cells.setter
-        def cells(self, value, self.squareSize):
-            self._cells = self.__check_value(value, squareSize)
+    @cells.setter
+    def cells(self, tab):
+        self._cells = self.__check_cells(tab)
 
-        @staticmethod
-        def __check_value(value):
-            res = isinstance(value, list)
-            if not res:
-                raise AttributeError(f"{value} is not a list")
-            else:
-                for cell in value:
-                    res = isinstance(cell, Cell)
-                    if not res:
-                        raise AttributeError(f"")
+    def __check_cells(self, tab):
+        res = isinstance(tab, list)
+        if not res:
+            raise AttributeError(f"tab = {tab} is not a list")
+        else:
+            for cell in tab:
+                res = isinstance(cell, Cell)
+                if not res:
+                    raise AttributeError(f"tab = {tab} need to contain cells only")
+
+    @property
+    def display(self):
+        return self._display
+
+    @cells.setter
+    def display(self, tab):
+        self._display = self.__check_display(tab)
+
+    def __check_display(self, string):
+        res = isinstance(string, str)
+        if not res:
+            raise AttributeError(f"string = {string} is not a string")
+        #else:
+
+   # ". . . .\n . X X .\n . X . . \n. . . .\n"
+
