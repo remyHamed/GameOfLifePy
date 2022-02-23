@@ -45,6 +45,36 @@ class Grid:
         if value < 18:
             raise AttributeError(f"square_size = {value} is under 18")
 
+    def generate_next_state(self):
+        count = 0
+        for i in range(0, len(self.cells)):
+            for j in range(0, len(self.cells)):
+                for k in range(i - 1, i + 2):
+                    for l in range(j - 1, j + 2):
+                        if k == i and l == j:
+                            continue
+                        if k < 0 or l < 0:
+                            continue
+                        if k >= len(self.cells) or 1 >= len(self.cells):
+                            continue
+                        if self.cells[k][l].is_alive:
+                            count += 1
+                if self.cells[i][j].process_state(self.cells[i][j].is_alive, count):
+                    self.temps_cells[i][j].is_alive = True
+                else:
+                    self.temps_cells[i][j].is_alive = False
+
+                count = 0
+
+        self.cells = self.temps_cell
+        for i in range(0, len(self.cells)):
+            for j in range(0, len(self.cells)):
+                display = display + self.cells[i][j].to_string()
+                if j < (len(self.cells) - 1):
+                    display = display + " "
+                if j == (len(self.cells) - 1) and i < (len(self.cells) - 1):
+                    display = display + "\n"
+
 
     @property
     def cells(self):
