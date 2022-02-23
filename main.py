@@ -1,3 +1,8 @@
+import time
+
+def current_milli_time():
+    return round(time.time() * 1000)
+
 class Cell:
 
     #constructeur
@@ -12,8 +17,7 @@ class Cell:
     def is_alive(self, value):
         self._is_alive = self.__check_value(value)
 
-    @staticmethod
-    def __check_value(value):
+    def __check_value(self, value):
         value = isinstance(value, bool)
         if not value:
             raise AttributeError(f"value = {value} is not convertible to integer\n")
@@ -21,12 +25,32 @@ class Cell:
             return value
 
 
+    def process_state(self,is_alive, nb_neighbour_cells_alive):
+
+        if is_alive and (nb_neighbour_cells_alive == 2 or nb_neighbour_cells_alive == 3):
+            return True
+
+        if not is_alive and nb_neighbour_cells_alive == 3:
+            return True
+
+        return False;
+
+    def to_string(self):
+        if self.is_alive:
+            return  " X"
+        else:
+            return " ."
+
+
+
+
 class Grid:
 
     #constructeur
-    def __init__(self, cells, t_grid, square_size , display):
-        self.square_size = square_size
-        self.cells = cells
+    def __init__(self, square_size):
+        self._square_size = square_size
+        self._cells = [[Cell(False)]* self.square_size for i in range( self.square_size)]
+        self._temps_cells = [[Cell(False)]* self.square_size for i in range( self.square_size)]
 
     @property
     def square_size(self):
@@ -45,13 +69,27 @@ class Grid:
         if value < 18:
             raise AttributeError(f"square_size = {value} is under 18")
 
+    def initial_cells(self):
+        #for i in range(0, self.square_size):
+        #    self.cells = [[Cell(False)]* self.square_size for i in range( self.square_size)]
+        #    self.temps_cells.append([Cell(False) for x in range(0, self.square_size)])
+
+        for i in range(0, self._square_size ):
+            for j in range(0, self._square_size ):
+                if current_milli_time() % 2 == 0 :
+                    self.cells[i][j] = Cell(False)
+                else:
+                    self.cells[i][j] = Cell(True)
+
+
+
     def generate_next_state(self):
         count = 0
-        for i in range(0, len(self.cells)):
+        for m in range(0, len(self.cells)):
             for j in range(0, len(self.cells)):
-                for k in range(i - 1, i + 2):
+                for k in range(m - 1, m + 2):
                     for l in range(j - 1, j + 2):
-                        if k == i and l == j:
+                        if k == m and l == j:
                             continue
                         if k < 0 or l < 0:
                             continue
@@ -59,21 +97,20 @@ class Grid:
                             continue
                         if self.cells[k][l].is_alive:
                             count += 1
-                if self.cells[i][j].process_state(self.cells[i][j].is_alive, count):
-                    self.temps_cells[i][j].is_alive = True
+                print(m, j)
+                if self.cells[m][j].process_state(self.cells[m][j].is_alive, count):
+                    self.temps_cells[m][j].is_alive = True
                 else:
-                    self.temps_cells[i][j].is_alive = False
-
+                    self.temps_cells[m][j].is_alive = False
                 count = 0
-
-        self.cells = self.temps_cell
-        for i in range(0, len(self.cells)):
+        self.cells = self.temps_cells
+        for m in range(0, len(self.cells)):
             for j in range(0, len(self.cells)):
-                display = display + self.cells[i][j].to_string()
+                self.display = self.display + self.cells[m][j].to_string()
                 if j < (len(self.cells) - 1):
-                    display = display + " "
-                if j == (len(self.cells) - 1) and i < (len(self.cells) - 1):
-                    display = display + "\n"
+                    display = self.display + " "
+                if j == (len(self.cells) - 1) and m < (len(self.cells) - 1):
+                    display = self.display + "\n"
 
 
     @property
@@ -95,10 +132,18 @@ class Grid:
                     raise AttributeError(f"tab = {tab} need to contain cells only")
 
     @property
+    def temps_cells(self):
+        return self._temps_cells
+
+    @temps_cells.setter
+    def temps_cells(self, tab):
+        self._temps_cells = self.__check_cells(tab)
+
+    @property
     def display(self):
         return self._display
 
-    @cells.setter
+    @display.setter
     def display(self, tab):
         self._display = self.__check_display(tab)
 
@@ -108,5 +153,14 @@ class Grid:
             raise AttributeError(f"string = {string} is not a string")
         #else:
 
-   # ". . . .\n . X X .\n . X . . \n. . . .\n"
+
+
+g = Grid( 20)
+print(g.square_size)
+g.initial_cells()
+for i in range(0, 50):
+    g.generate_next_state()
+    print(g.display)
+    print("\n\n\n")
+
 
