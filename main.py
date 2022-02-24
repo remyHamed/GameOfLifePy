@@ -1,5 +1,5 @@
 import time
-
+import random
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -78,10 +78,12 @@ class Grid:
 
         for i in range(0, self._square_size):
             for j in range(0, self._square_size):
-                if current_milli_time() % 2 == 0:
+                if random.randint(1, 1000) % 2 == 0:
                     self.cells[i][j] = Cell(False)
+                    print("mort")
                 else:
                     self.cells[i][j] = Cell(True)
+                    print("vivant")
 
     def generate_next_state(self):
         count = 0
@@ -108,12 +110,14 @@ class Grid:
         new_string_display = ""
         for m in range(0, len(self.cells)):
             for j in range(0, len(self.cells)):
-                self.display(new_string_display + self.cells[m][j].__str__)
-                if j < (len(self.cells) - 1):
-                    new_string_display = new_string_display + " "
-                if j == (len(self.cells) - 1) and m < (len(self.cells) - 1):
-                    new_string_display = new_string_display + "\n"
-        self.display(new_string_display)
+                print(self.cells[m][j].to_string(), end='')
+            print(' \n')
+                #self.display(new_string_display + str(self.cells[m][j].__str__))
+                #if j < (len(self.cells) - 1):
+                    #new_string_display = new_string_display + " "
+                #if j == (len(self.cells) - 1) and m < (len(self.cells) - 1):
+                    #new_string_display = new_string_display + "\n"
+            #self.display(new_string_display)
 
 
     @property
@@ -159,8 +163,7 @@ class Grid:
 g = Grid(20)
 print(g.square_size)
 g.initial_cells()
-print(g.display)
+
 for i in range(0, 50):
     g.generate_next_state()
-    print(g.display)
-    print("\n\n\n")
+    print("\n")
