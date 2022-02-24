@@ -34,13 +34,13 @@ class Cell:
         if not is_alive and nb_neighbour_cells_alive == 3:
             return True
 
-        return False;
+        return False
 
     def to_string(self):
         if self.is_alive:
-            return " X"
+            return "X"
         else:
-            return " ."
+            return "."
 
 
 class Grid:
@@ -78,12 +78,22 @@ class Grid:
 
         for i in range(0, self._square_size):
             for j in range(0, self._square_size):
-                if random.randint(1, 1000) % 2 == 0:
+                self.cells[i][j] = Cell(False)
+
+        for i in range(0, self._square_size):
+            for j in range(0, self._square_size,2):
+                if random.randint(1, 100) % 2 == 0 and current_milli_time() % 2 == 0:
                     self.cells[i][j] = Cell(False)
                     print("mort")
                 else:
                     self.cells[i][j] = Cell(True)
                     print("vivant")
+
+    def show(self):
+        for m in range(0, len(self.cells)):
+            for j in range(0, len(self.cells)):
+                print(self.cells[m][j].to_string(), end='')
+            print(' \n')
 
     def generate_next_state(self):
         count = 0
@@ -99,19 +109,19 @@ class Grid:
                             continue
                         if self.cells[k][l].is_alive:
                             count += 1
-
                 if self.cells[m][j].process_state(self.cells[m][j].is_alive, count):
-                    self.temps_cells[m][j].is_alive = True
+                    self.temps_cells[m][j].is_alive = True #is_alive(True)
                 else:
-                    self.temps_cells[m][j].is_alive = False
+                    self.temps_cells[m][j].is_alive = False #is_alive(True)
                 count = 0
+
         self.cells = self.temps_cells.copy()
 
         new_string_display = ""
         for m in range(0, len(self.cells)):
             for j in range(0, len(self.cells)):
                 print(self.cells[m][j].to_string(), end='')
-            print(' \n')
+            print(' \n', end='')
                 #self.display(new_string_display + str(self.cells[m][j].__str__))
                 #if j < (len(self.cells) - 1):
                     #new_string_display = new_string_display + " "
@@ -162,8 +172,14 @@ class Grid:
 
 g = Grid(20)
 print(g.square_size)
+print("1\n")
 g.initial_cells()
+print("2\n")
+g.show()
+print("3\n\n")
+g.generate_next_state()
+g.show()
 
-for i in range(0, 50):
-    g.generate_next_state()
-    print("\n")
+#for i in range(0, 50):
+    #g.generate_next_state()
+    #print("\n")
