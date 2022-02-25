@@ -16,13 +16,13 @@ class Cell:
         return self._is_alive
 
     @is_alive.setter
-    def is_alive(self, value):
+    def set_alive(self, value):
         self._is_alive = self.__check_value(value)
 
     def __check_value(self, value):
         value = isinstance(value, bool)
         if not value:
-            raise AttributeError(f"value = {value} is not convertible to integer\n")
+            raise AttributeError(f"value = {value} is not convertible to bool\n")
         else:
             return value
 
@@ -38,9 +38,9 @@ class Cell:
 
     def to_string(self):
         if self.is_alive:
-            return "X"
+            return " X"
         else:
-            return "."
+            return " ."
 
 
 class Grid:
@@ -50,6 +50,7 @@ class Grid:
         self._square_size = square_size
         for i in range(0, self.square_size):
             self._cells = [[Cell(False)] * self.square_size for i in range(self.square_size)]
+            
         for i in range(0, self.square_size):
             self._temps_cells = [[Cell(False)] * self.square_size for i in range(self.square_size)]
         self._display = " "
@@ -75,19 +76,27 @@ class Grid:
         # for i in range(0, self.square_size):
         #    self.cells = [[Cell(False)]* self.square_size for i in range( self.square_size)]
         #    self.temps_cells.append([Cell(False) for x in range(0, self.square_size)])
-
+    
         for i in range(0, self._square_size):
             for j in range(0, self._square_size):
                 self.cells[i][j] = Cell(False)
 
         for i in range(0, self._square_size):
             for j in range(0, self._square_size,2):
-                if random.randint(1, 100) % 2 == 0 and current_milli_time() % 2 == 0:
+                if random.randint(1, 10000) < 2 :
                     self.cells[i][j] = Cell(False)
-                    print("mort")
+                    # print("mort")
                 else:
                     self.cells[i][j] = Cell(True)
-                    print("vivant")
+                    #print("vivant")
+
+    @property
+    def cells(self):
+        return self._cells
+
+    @cells.setter
+    def cells(self, tab):
+        self._cells = tab
 
     def show(self):
         for m in range(0, len(self.cells)):
@@ -97,10 +106,11 @@ class Grid:
 
     def generate_next_state(self):
         count = 0
-        for m in range(0, len(self.cells)):
-            for j in range(0, len(self.cells)):
-                for k in range(m - 1, m + 2):
-                    for l in range(j - 1, j + 2):
+        nwTab = [[0]*self.square_size]*self.square_size
+        for m in range(0, len(self.cells)): # 0
+            for j in range(0, len(self.cells)): # 0
+                for k in range(m - 1, m + 2): # 0
+                    for l in range(j - 1, j + 2): # 1
                         if k == m and l == j:
                             continue
                         if k < 0 or l < 0:
@@ -110,12 +120,20 @@ class Grid:
                         if self.cells[k][l].is_alive:
                             count += 1
                 if self.cells[m][j].process_state(self.cells[m][j].is_alive, count):
-                    self.temps_cells[m][j].is_alive = True #is_alive(True)
+                    #print("vrai")
+                    #self.temps_cells[m][j].set_alive(True) #is_alive(True)
+                    nwTab[m][j] = Cell(True)
+                    print(nwTab[m][j].to_string())
+                    #print(self.temps_cells[m][j].is_alive)
                 else:
-                    self.temps_cells[m][j].is_alive = False #is_alive(True)
+                    #print("false")
+                    #self.temps_cells[m][j].set_alive(False) #is_alive(True)
+                    nwTab[m][j] = Cell(False)
+                    print(nwTab[m][j].to_string())
+                    #print(self.temps_cells[m][j].is_alive)
                 count = 0
-
-        self.cells = self.temps_cells.copy()
+        
+        self.cells = nwTab  
 
         new_string_display = ""
         for m in range(0, len(self.cells)):
@@ -130,13 +148,7 @@ class Grid:
             #self.display(new_string_display)
 
 
-    @property
-    def cells(self):
-        return self._cells
 
-    @cells.setter
-    def cells(self, string):
-        self._cells = string
 
     # def __check_cells(self, tab):
     #    res = isinstance(tab, list)
@@ -177,6 +189,8 @@ g.initial_cells()
 print("2\n")
 g.show()
 print("3\n\n")
+g.generate_next_state()
+g.show()
 g.generate_next_state()
 g.show()
 
