@@ -1,5 +1,7 @@
 import time
 import random
+import tkinter
+from tkinter import *
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -16,7 +18,7 @@ class Cell:
         return self._is_alive
 
     @is_alive.setter
-    def set_alive(self, value):
+    def is_alive(self, value):
         self._is_alive = self.__check_value(value)
 
     def __check_value(self, value):
@@ -27,13 +29,10 @@ class Cell:
             return value
 
     def process_state(self, is_alive, nb_neighbour_cells_alive):
-
         if is_alive and (nb_neighbour_cells_alive == 2 or nb_neighbour_cells_alive == 3):
             return True
-
         if not is_alive and nb_neighbour_cells_alive == 3:
             return True
-
         return False
 
     def to_string(self):
@@ -48,11 +47,14 @@ class Grid:
     # constructeur
     def __init__(self, square_size):
         self._square_size = square_size
-        for i in range(0, self.square_size):
-            self._cells = [[Cell(False)] * self.square_size for i in range(self.square_size)]
-            
-        for i in range(0, self.square_size):
-            self._temps_cells = [[Cell(False)] * self.square_size for i in range(self.square_size)]
+        self._cells = [[]]
+        for i in range(0, self._square_size):
+            self._cells.append([])
+            for j in range(0, self._square_size):
+                if random.randint(1, 10000) < 5000:
+                    self._cells[i].append(Cell(False))
+                else:
+                    self._cells[i].append((Cell(True)))
         self._display = " "
 
     @property
@@ -66,29 +68,17 @@ class Grid:
     def __check_square_size(self, value):
         try:
             value = int(value)
+            if value < 18:
+                raise AttributeError(f"square_size = {value} is under 18")
+            return value
         except Exception:
             raise AttributeError(f"square_size = {value} is not convertible to integer")
 
-        if value < 18:
-            raise AttributeError(f"square_size = {value} is under 18")
 
-    def initial_cells(self):
+    #def initial_cells(self):
         # for i in range(0, self.square_size):
         #    self.cells = [[Cell(False)]* self.square_size for i in range( self.square_size)]
         #    self.temps_cells.append([Cell(False) for x in range(0, self.square_size)])
-    
-        for i in range(0, self._square_size):
-            for j in range(0, self._square_size):
-                self.cells[i][j] = Cell(False)
-
-        for i in range(0, self._square_size):
-            for j in range(0, self._square_size,2):
-                if random.randint(1, 10000) < 2 :
-                    self.cells[i][j] = Cell(False)
-                    # print("mort")
-                else:
-                    self.cells[i][j] = Cell(True)
-                    #print("vivant")
 
     @property
     def cells(self):
@@ -99,47 +89,41 @@ class Grid:
         self._cells = tab
 
     def show(self):
-        for m in range(0, len(self.cells)):
-            for j in range(0, len(self.cells)):
+        for m in range(0, self.square_size):
+            for j in range(0, self.square_size):
                 print(self.cells[m][j].to_string(), end='')
             print(' \n')
 
     def generate_next_state(self):
         count = 0
-        nwTab = [[0]*self.square_size]*self.square_size
-        for m in range(0, len(self.cells)): # 0
-            for j in range(0, len(self.cells)): # 0
+        nwtab = [[]]
+        for m in range(0, self.square_size): # 0
+            nwtab.append([])
+            for j in range(0, self.square_size): # 0
                 for k in range(m - 1, m + 2): # 0
                     for l in range(j - 1, j + 2): # 1
                         if k == m and l == j:
                             continue
                         if k < 0 or l < 0:
                             continue
-                        if k >= len(self.cells) or l >= len(self.cells):
+                        if k >= self.square_size or l >= self.square_size:
                             continue
                         if self.cells[k][l].is_alive:
                             count += 1
                 if self.cells[m][j].process_state(self.cells[m][j].is_alive, count):
                     #print("vrai")
                     #self.temps_cells[m][j].set_alive(True) #is_alive(True)
-                    nwTab[m][j] = Cell(True)
-                    print(nwTab[m][j].to_string())
+                    nwtab[m].append(Cell(True))
                     #print(self.temps_cells[m][j].is_alive)
                 else:
                     #print("false")
                     #self.temps_cells[m][j].set_alive(False) #is_alive(True)
-                    nwTab[m][j] = Cell(False)
-                    print(nwTab[m][j].to_string())
+                    nwtab[m].append(Cell(False))
                     #print(self.temps_cells[m][j].is_alive)
                 count = 0
         
-        self.cells = nwTab  
+        self.cells = nwtab
 
-        new_string_display = ""
-        for m in range(0, len(self.cells)):
-            for j in range(0, len(self.cells)):
-                print(self.cells[m][j].to_string(), end='')
-            print(' \n', end='')
                 #self.display(new_string_display + str(self.cells[m][j].__str__))
                 #if j < (len(self.cells) - 1):
                     #new_string_display = new_string_display + " "
@@ -161,14 +145,6 @@ class Grid:
     #        raise AttributeError(f"tab = {tab} need to contain cells only")
 
     @property
-    def temps_cells(self):
-        return self._temps_cells
-
-    @temps_cells.setter
-    def temps_cells(self, tab):
-        self._temps_cells = tab
-
-    @property
     def display(self):
         return self._display
 
@@ -184,16 +160,61 @@ class Grid:
 
 g = Grid(20)
 print(g.square_size)
+'''
 print("1\n")
-g.initial_cells()
 print("2\n")
 g.show()
+
 print("3\n\n")
 g.generate_next_state()
 g.show()
+print("4\n\n")
 g.generate_next_state()
 g.show()
 
-#for i in range(0, 50):
-    #g.generate_next_state()
-    #print("\n")
+for i in range(0, 50):
+    g.generate_next_state()
+    g.show()
+    print("-------------\n")
+
+'''
+
+# création de la fenetre
+window = Tk()
+window.title("Game Of Life") # titre
+window.geometry("1080x720") # taille
+window.minsize(480, 360) # taille minimal
+window.iconbitmap("logo.ico") #logo (.ico obligatoire)
+window.config(background="grey") # couleur de fond
+
+#creation d'un composant
+title = Label(window, text="Game Of Life", font=("Arial", 40), bg="white", fg="red")
+title.pack() # ajoute le composant a la fenetre
+
+#creation d'un second composant
+subtitle = Label(window, text="Sa veut dire jeu de la vie en français !", font=("Arial", 10), bg="white", fg="red")
+subtitle.pack()
+
+#creation d'un composant qui va contenir notre grille
+grid = Frame(window, bg="grey")
+
+# affichage de la grille
+def refresh(g):
+    g.generate_next_state()
+    for i in range(g.square_size):
+        for j in range(g.square_size):
+            if(g.cells[i][j].is_alive):
+                chosenColor = "black"
+            else:
+                chosenColor = "white"
+            # canvas qui va nous servire a dessiner notre couleurs
+            canvas = Canvas(grid, width=25, height=25, bg=chosenColor, highlightthickness=0)
+            canvas.grid(row=i, column=j)
+
+refresh(g)
+grid.pack()
+window.mainloop()
+
+
+
+
