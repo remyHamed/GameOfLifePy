@@ -48,6 +48,7 @@ class Grid:
     def __init__(self, square_size):
         self._square_size = square_size
         self._cells = [[]]
+        self._cells.clear()
         for i in range(0, self._square_size):
             self._cells.append([])
             for j in range(0, self._square_size):
@@ -158,7 +159,7 @@ class Grid:
    #         raise AttributeError(f"string = {string} is not a string")
 
 
-g = Grid(20)
+g = Grid(25)
 print(g.square_size)
 '''
 print("1\n")
@@ -183,7 +184,7 @@ for i in range(0, 50):
 window = Tk()
 window.title("Game Of Life") # titre
 window.geometry("1080x720") # taille
-window.minsize(480, 360) # taille minimal
+window.minsize(1920, 1080) # taille minimal
 window.iconbitmap("logo.ico") #logo (.ico obligatoire)
 window.config(background="grey") # couleur de fond
 
@@ -197,22 +198,41 @@ subtitle.pack()
 
 #creation d'un composant qui va contenir notre grille
 grid = Frame(window, bg="grey")
-
-# affichage de la grille
-def refresh(g):
-    g.generate_next_state()
-    for i in range(g.square_size):
-        for j in range(g.square_size):
-            if(g.cells[i][j].is_alive):
-                chosenColor = "black"
-            else:
-                chosenColor = "white"
-            # canvas qui va nous servire a dessiner notre couleurs
-            canvas = Canvas(grid, width=25, height=25, bg=chosenColor, highlightthickness=0)
-            canvas.grid(row=i, column=j)
-
-refresh(g)
 grid.pack()
+# affichage de la grille
+
+canvas_list = [[]]
+
+def init_grid():
+    canvas_list.clear()
+    g.generate_next_state()
+    for i in range(0, g.square_size):
+        canvas_list.append([])
+        for j in range(0, g.square_size):
+            if(g.cells[i][j].is_alive):
+                chosencolor = "black"
+            else:
+                chosencolor = "white"
+            # canvas qui va nous servire a dessiner notre couleurs
+            canvas = Canvas(grid, width=25, height=25, bg=chosencolor, highlightthickness=0)
+            canvas.grid(row=i, column=j)
+            canvas_list[i].append(canvas)
+
+def refresh_grid():
+    g.generate_next_state()
+    for k in range(g.square_size):
+        for i in range(g.square_size):
+            if (g.cells[k][i].is_alive):
+                chosencolor = "black"
+            else:
+                chosencolor = "white"
+            canvas = canvas_list[k][i]
+            canvas.configure(bg=chosencolor)
+            canvas_list[k][i] = canvas
+    grid.after(100, refresh_grid)
+
+init_grid()
+refresh_grid()
 window.mainloop()
 
 
