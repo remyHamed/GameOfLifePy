@@ -1,0 +1,12 @@
+# DO NOT USE THIS FILE
+# Need to be a square with a minimum width of 18
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','X','X','X','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
+['O','O','O','O','O','O','O','O','O','O']
